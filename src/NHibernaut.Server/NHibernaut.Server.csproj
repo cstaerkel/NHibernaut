@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NHibernaut.Server</RootNamespace>
+    <AssemblyName>NHibernaut.Server</AssemblyName>
+    <IsPackable>true</IsPackable>
+    <PackageId>NHibernaut.Server</PackageId>
+    <Description>Independent in-process HttpListener dashboard server for NHibernaut. Serves a live web dashboard from any .NET host, no Kestrel/ASP.NET dependency.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NHibernaut.Core\NHibernaut.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Dashboard SPA shipped as embedded resources — no consumer build step. -->
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*" />
+  </ItemGroup>
+
+  <!-- HttpListener and System.Text.Json are both in-box on net10.0. No extra packages. -->
+
+</Project>

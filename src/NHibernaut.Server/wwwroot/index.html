@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NHibernaut</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">NHibernaut</div>
+    <div class="counters" id="counters">
+      <span class="counter"><b id="c-sessions">0</b> sessions</span>
+      <span class="counter"><b id="c-queries">0</b> queries</span>
+      <span class="counter"><b id="c-time">0</b> ms</span>
+      <span class="counter warn"><b id="c-nplus1">0</b> N+1</span>
+    </div>
+    <nav class="tabs">
+      <a href="#/sessions" data-tab="sessions" class="tab">Sessions</a>
+      <a href="#/aggregate" data-tab="aggregate" class="tab">Worst offenders</a>
+      <a href="#/compare" data-tab="compare" class="tab">Compare</a>
+    </nav>
+    <div class="actions">
+      <button id="live-toggle" class="btn" title="Pause/resume the live feed">⏸ Live</button>
+      <button id="clear-btn" class="btn danger" title="Clear the store">Clear</button>
+    </div>
+  </header>
+
+  <main id="app"><div class="empty">Loading…</div></main>
+
+  <script src="app.js"></script>
+</body>
+</html>

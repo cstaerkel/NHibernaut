@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NHibernaut.Sample.Web</RootNamespace>
+    <AssemblyName>NHibernaut.Sample.Web</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NHibernate" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NHibernaut.Core\NHibernaut.Core.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.Server\NHibernaut.Server.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.AspNetCore\NHibernaut.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>

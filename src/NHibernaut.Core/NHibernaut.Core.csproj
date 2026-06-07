@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NHibernaut.Core</RootNamespace>
+    <AssemblyName>NHibernaut.Core</AssemblyName>
+    <IsPackable>true</IsPackable>
+    <PackageId>NHibernaut.Core</PackageId>
+    <Description>Host-agnostic NHibernate profiler capture engine (no web dependency). Captures sessions, SQL, entity loads, writes, transactions and runs an anti-pattern analysis engine.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NHibernate" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NHibernaut.Tests" />
+    <InternalsVisibleTo Include="NHibernaut.AspNetCore" />
+  </ItemGroup>
+
+</Project>

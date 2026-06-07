@@ -1,0 +1,25 @@
+<Project>
+
+  <!-- Common settings for every project in the solution. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Quality is enforced via tests, not warnings-as-errors. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- Shared package authoring metadata (applied only to packable libraries below). -->
+  <PropertyGroup>
+    <Authors>NHibernaut contributors</Authors>
+    <Product>NHibernaut</Product>
+    <Copyright>Copyright (c) NHibernaut contributors</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/nhibernaut/nhibernaut</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>

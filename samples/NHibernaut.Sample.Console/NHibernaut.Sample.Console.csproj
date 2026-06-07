@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NHibernaut.Sample.ConsoleApp</RootNamespace>
+    <AssemblyName>NHibernaut.Sample.Console</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NHibernate" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NHibernaut.Core\NHibernaut.Core.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.Server\NHibernaut.Server.csproj" />
+  </ItemGroup>
+
+</Project>
