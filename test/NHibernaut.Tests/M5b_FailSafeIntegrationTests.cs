@@ -68,6 +68,7 @@ public class M5b_FailSafeIntegrationTests
         public ProfiledSession? GetSession(Guid sessionId) => throw new InvalidOperationException("boom");
         public IReadOnlyList<ProfiledSession> GetRecentSessions(int take) => throw new InvalidOperationException("boom");
         public void SealSession(Guid sessionId) => throw new InvalidOperationException("boom");
+        public void InsertSession(ProfiledSession session) => throw new InvalidOperationException("boom");
         public void Clear() => throw new InvalidOperationException("boom");
         public int Count => throw new InvalidOperationException("boom");
         public event Action<ProfiledSession>? SessionSealed { add { } remove { } }

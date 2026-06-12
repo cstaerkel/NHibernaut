@@ -9,9 +9,25 @@ There are two ways to consume NHibernaut:
 
 > **What gets installed:** the `nhibernaut-dashboard` background service (a self-contained build of
 > `NHibernaut.Server.Host`). It serves the same dashboard SPA + JSON API + SSE as the in-process
-> server. On its own its data store is **empty** — it only shows sessions that are fed to it (today
-> that means running profiled code in the same process; remote ingestion is planned). Installers are
-> attached to each [GitHub Release](https://github.com/cstaerkel/NHibernaut/releases).
+> server. Its data store starts **empty** — your apps feed it by **forwarding** their sealed sessions
+> to it (see *Feed the dashboard* below). Installers are attached to each
+> [GitHub Release](https://github.com/cstaerkel/NHibernaut/releases).
+
+## Feed the dashboard (remote forwarding)
+
+A deployed dashboard only shows data that apps send it. In each profiled app, turn on forwarding
+right after enabling capture:
+
+```csharp
+cfg.EnableNHibernaut();                                                  // capture (Tier A)
+NHibernaut.Server.RemoteForwarder.Enable("http://dashboard-host:5005", "<auth-token>");
+```
+
+Each time a session seals, the app ships it to the dashboard's `POST /api/ingest`. Forwarding is
+asynchronous, bounded, and fail-safe — if the dashboard is unreachable, sessions are dropped rather
+than queued without bound, and it never blocks or throws into your app. Pass the same
+`NHIBERNAUT_AUTH_TOKEN` the dashboard was configured with (required whenever it binds beyond
+loopback). Referencing `NHibernaut.Server` is enough; the app does not host its own dashboard.
 
 ---
 

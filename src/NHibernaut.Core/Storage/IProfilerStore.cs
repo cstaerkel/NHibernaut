@@ -22,6 +22,13 @@ public interface IProfilerStore
     /// <summary>Marks a session ended and sealed; raises <see cref="SessionSealed"/>.</summary>
     void SealSession(Guid sessionId);
 
+    /// <summary>
+    /// Inserts (or replaces by id) an already-built, sealed session — e.g. one received from a remote
+    /// forwarder — and raises <see cref="SessionSealed"/>. Unlike <see cref="GetOrCreateSession"/>, the
+    /// caller supplies the fully-populated session rather than building it incrementally via capture.
+    /// </summary>
+    void InsertSession(ProfiledSession session);
+
     /// <summary>Removes all sessions.</summary>
     void Clear();
 

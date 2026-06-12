@@ -149,6 +149,7 @@ public sealed class NHibernautServer : IDisposable
         if (method == "GET" && path == "/api/alerts") { HandleAlerts(context); return; }
         if (method == "GET" && path == "/api/stream") { HandleStream(context); return; }
         if (method == "DELETE" && path == "/api/sessions") { NHibernautRuntime.Store.Clear(); context.Response.StatusCode = 204; context.Response.Close(); return; }
+        if (method == "POST" && path == "/api/ingest") { HandleIngest(context); return; }
         if (method == "GET") { Assets.Serve(context, path); return; }
 
         WriteText(context, 405, "Method Not Allowed");
@@ -239,6 +240,42 @@ public sealed class NHibernautServer : IDisposable
             store.SessionSealed -= OnSealed;
             try { response.Close(); } catch { /* ignore */ }
         }
+    }
+
+    private void HandleIngest(HttpListenerContext context)
+    {
+        SessionDetailDto? dto;
+        try
+        {
+            using var reader = new System.IO.StreamReader(context.Request.InputStream, Encoding.UTF8);
+            dto = JsonSerializer.Deserialize<SessionDetailDto>(reader.ReadToEnd(), JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            NHibernautRuntime.ReportInternalError(ex);
+            WriteText(context, 400, "Invalid session payload");
+            return;
+        }
+
+        if (dto is null)
+        {
+            WriteText(context, 400, "Empty session payload");
+            return;
+        }
+
+        try
+        {
+            NHibernautRuntime.Store.InsertSession(SessionReconstructor.FromDetail(dto));
+        }
+        catch (Exception ex)
+        {
+            NHibernautRuntime.ReportInternalError(ex);
+            WriteText(context, 400, "Invalid session payload");
+            return;
+        }
+
+        context.Response.StatusCode = 202;
+        context.Response.Close();
     }
 
     private bool Authorized(HttpListenerRequest request)

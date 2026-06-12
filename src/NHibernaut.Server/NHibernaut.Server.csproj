@@ -13,6 +13,10 @@
     <ProjectReference Include="..\NHibernaut.Core\NHibernaut.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NHibernaut.Tests" />
+  </ItemGroup>
+
   <!-- Dashboard SPA shipped as embedded resources — no consumer build step. -->
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

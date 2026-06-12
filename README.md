@@ -140,7 +140,8 @@ full walkthrough.
 ### JSON API
 
 `GET /api/sessions`, `GET /api/sessions/{id}`, `GET /api/aggregate`, `GET /api/alerts`,
-`GET /api/stream` (SSE), `DELETE /api/sessions`, `GET /` + assets.
+`GET /api/stream` (SSE), `POST /api/ingest` (remote forwarding), `DELETE /api/sessions`,
+`GET /` + assets.
 
 ## Deploy the dashboard as a service
 
@@ -150,6 +151,14 @@ from native OS installers (`.msi` / `.deb` / `.rpm` / `.pkg`) attached to each
 of `NHibernaut.Server.Host` (a Windows service / systemd unit / launchd daemon) serving the dashboard
 at `http://<host>:5005`, configured via `NHIBERNAUT_BIND` / `NHIBERNAUT_PORT` / `NHIBERNAUT_AUTH_TOKEN`.
 See the **[Install guide](docs/INSTALL.md)**.
+
+To make a deployed dashboard show your apps' activity, turn on **forwarding** next to capture — each
+sealed session is shipped to the central dashboard's `POST /api/ingest` (async, bounded, fail-safe):
+
+```csharp
+cfg.EnableNHibernaut();                                            // capture
+RemoteForwarder.Enable("http://dashboard-host:5005", "<token>");   // forward sealed sessions
+```
 
 ## Security notes
 
