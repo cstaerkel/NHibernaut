@@ -35,9 +35,6 @@ even has one).
 - **NHibernaut.AspNetCore** (optional) targets **.NET 10**.
 - ORM: NHibernate 5.x (developed/tested against 5.6).
 
-> Note: this build targets **.NET 10 only**. The original spec multi-targeted `netstandard2.0` for
-> .NET Framework 4.x reach; that compatibility was intentionally dropped for this build.
-
 ## Quickstart (Tier A — recommended, works in any host)
 
 Reference `NHibernaut.Core` + `NHibernaut.Server`, then:
