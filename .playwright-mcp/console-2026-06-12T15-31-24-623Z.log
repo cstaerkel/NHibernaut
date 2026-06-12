@@ -1,0 +1,54 @@
+[   37922ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:5005/api/sessions/c257e400-b81b-4ab4-b730-6ab14463857e:0
+[   37932ms] Error: /api/sessions/c257e400-b81b-4ab4-b730-6ab14463857e -> 404
+    at http://127.0.0.1:5005/app.js:20:22
+    at async selectSession (http://127.0.0.1:5005/app.js:112:20)
+[   39509ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:5005/api/sessions/fd58c3f2-56da-4716-a9c7-c5e363d5e99d:0
+[   39556ms] Error: /api/sessions/fd58c3f2-56da-4716-a9c7-c5e363d5e99d -> 404
+    at http://127.0.0.1:5005/app.js:20:22
+    at async selectSession (http://127.0.0.1:5005/app.js:112:20)
+[   40325ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:5005/api/sessions/c257e400-b81b-4ab4-b730-6ab14463857e:0
+[   40366ms] Error: /api/sessions/c257e400-b81b-4ab4-b730-6ab14463857e -> 404
+    at http://127.0.0.1:5005/app.js:20:22
+    at async selectSession (http://127.0.0.1:5005/app.js:112:20)
+[   90557ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[   93560ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[   96562ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[   99563ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  102568ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  105570ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  108572ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  111575ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  114578ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  117581ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  120584ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  123587ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  126589ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  129592ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  132595ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  135597ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  138600ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  141603ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  144606ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  147608ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  150610ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  153612ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  156616ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  159619ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  162622ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  165625ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  168627ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  171629ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  174632ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  177634ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  180636ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  183639ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  186642ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  189644ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  192647ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  195649ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  198653ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  201656ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  204659ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  207662ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  210663ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
+[  213666ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5005/api/stream:0
