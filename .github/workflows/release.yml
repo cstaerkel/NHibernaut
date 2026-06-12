@@ -133,7 +133,7 @@ jobs:
       - name: NuGet login (Trusted Publishing / OIDC -> short-lived key)
         id: login
         if: ${{ vars.NUGET_USER != '' }}
-        uses: NuGet/login@v1
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         with:
           user: ${{ vars.NUGET_USER }}
       - name: Push to NuGet.org
@@ -149,6 +149,6 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with: { path: dist, merge-multiple: true }
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: dist/**
