@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Publish / packaging output
+publish/
+nupkgs/
+nupkgs-local/
+*.nupkg
+*.snupkg
+
+# Native installer staging (CI)
+pkgroot/
+payload/
+*.msi
+*.deb
+*.rpm
+*.pkg
+
+# IDE / OS
+.vs/
+.idea/
+*.user
+.DS_Store
+
+# Tooling
+*.binlog
+TestResults/
