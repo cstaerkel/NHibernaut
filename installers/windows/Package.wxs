@@ -1,0 +1,48 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="NHibernaut Dashboard"
+           Manufacturer="NHibernaut contributors"
+           Version="$(var.Version)"
+           UpgradeCode="9F969AE8-73D5-4328-BB6C-3D26DF765114"
+           Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of NHibernaut Dashboard is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="NHibernaut Dashboard">
+
+        <Component Id="ServiceExe" Bitness="always64">
+          <File Id="HostExe" Source="$(var.PublishDir)\nhibernaut-dashboard.exe" KeyPath="yes" />
+          <ServiceInstall Id="DashboardSvc"
+                          Name="NHibernautDashboard"
+                          DisplayName="NHibernaut Dashboard"
+                          Description="NHibernaut profiler dashboard web server."
+                          Type="ownProcess"
+                          Start="auto"
+                          ErrorControl="normal"
+                          Account="LocalSystem"
+                          Vital="yes" />
+          <ServiceControl Id="DashboardSvcCtl"
+                          Name="NHibernautDashboard"
+                          Start="install"
+                          Stop="both"
+                          Remove="uninstall"
+                          Wait="yes" />
+        </Component>
+
+        <Component Id="EnvVars" Bitness="always64">
+          <Environment Id="EnvBind"  Name="NHIBERNAUT_BIND"       Value="0.0.0.0" Action="set" System="yes" Part="all" Permanent="no" />
+          <Environment Id="EnvPort"  Name="NHIBERNAUT_PORT"       Value="5005"    Action="set" System="yes" Part="all" Permanent="no" />
+          <Environment Id="EnvToken" Name="NHIBERNAUT_AUTH_TOKEN" Value=""        Action="set" System="yes" Part="all" Permanent="no" />
+          <RegistryValue Root="HKLM" Key="Software\NHibernaut\Dashboard" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="Main" Title="NHibernaut Dashboard" Level="1">
+      <ComponentRef Id="ServiceExe" />
+      <ComponentRef Id="EnvVars" />
+    </Feature>
+  </Package>
+</Wix>

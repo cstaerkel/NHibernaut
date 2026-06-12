@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\NHibernaut.Core\NHibernaut.Core.csproj" />
     <ProjectReference Include="..\..\src\NHibernaut.Server\NHibernaut.Server.csproj" />
     <ProjectReference Include="..\..\src\NHibernaut.AspNetCore\NHibernaut.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.Server.Host\NHibernaut.Server.Host.csproj" />
   </ItemGroup>
 
 </Project>

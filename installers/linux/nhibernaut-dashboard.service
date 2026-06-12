@@ -1,0 +1,16 @@
+[Unit]
+Description=NHibernaut Dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/lib/nhibernaut-dashboard/nhibernaut-dashboard
+EnvironmentFile=-/etc/nhibernaut-dashboard/dashboard.env
+Restart=on-failure
+RestartSec=3
+DynamicUser=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

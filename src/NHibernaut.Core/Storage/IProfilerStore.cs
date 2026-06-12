@@ -22,6 +22,20 @@ public interface IProfilerStore
     /// <summary>Marks a session ended and sealed; raises <see cref="SessionSealed"/>.</summary>
     void SealSession(Guid sessionId);
 
+    /// <summary>
+    /// Inserts (or replaces by id) an already-built, sealed session — e.g. one received from a remote
+    /// forwarder — and raises <see cref="SessionSealed"/>. Unlike <see cref="GetOrCreateSession"/>, the
+    /// caller supplies the fully-populated session rather than building it incrementally via capture.
+    /// </summary>
+    /// <remarks>
+    /// Has a default (throwing) implementation so existing custom stores remain source-compatible:
+    /// a store that does not host remote ingestion need not implement it. The in-box
+    /// <see cref="InMemoryProfilerStore"/> overrides it.
+    /// </remarks>
+    void InsertSession(ProfiledSession session)
+        => throw new NotSupportedException(
+            $"{GetType().Name} does not support remote session ingestion; override InsertSession to accept forwarded sessions.");
+
     /// <summary>Removes all sessions.</summary>
     void Clear();
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.nhibernaut.dashboard</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/nhibernaut-dashboard/nhibernaut-dashboard</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>NHIBERNAUT_BIND</key><string>0.0.0.0</string>
+    <key>NHIBERNAUT_PORT</key><string>5005</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/var/log/nhibernaut-dashboard.log</string>
+  <key>StandardErrorPath</key><string>/var/log/nhibernaut-dashboard.log</string>
+</dict>
+</plist>

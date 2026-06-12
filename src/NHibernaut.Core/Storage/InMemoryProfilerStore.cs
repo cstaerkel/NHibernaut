@@ -93,6 +93,23 @@ public sealed class InMemoryProfilerStore : IProfilerStore
         SessionSealed?.Invoke(session);
     }
 
+    public void InsertSession(ProfiledSession session)
+    {
+        if (session is null) throw new ArgumentNullException(nameof(session));
+
+        lock (_gate)
+        {
+            if (_byId.ContainsKey(session.Id))
+                _order.Remove(session.Id); // upsert: re-insert as newest
+            _byId[session.Id] = session;
+            _order.AddLast(session.Id);
+            Prune();
+        }
+
+        // Raise outside the lock, mirroring SealSession, so subscribers (SSE) can't deadlock.
+        SessionSealed?.Invoke(session);
+    }
+
     public void Clear()
     {
         lock (_gate)

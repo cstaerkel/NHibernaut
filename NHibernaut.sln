@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernaut.AspNetCore", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernaut.Sample.Web", "samples\NHibernaut.Sample.Web\NHibernaut.Sample.Web.csproj", "{1A18270D-2445-476A-A491-D9EDD2D2886E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernaut.Server.Host", "src\NHibernaut.Server.Host\NHibernaut.Server.Host.csproj", "{9422DE4D-84B4-41FC-8884-1B91744469D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,18 @@ Global
 		{1A18270D-2445-476A-A491-D9EDD2D2886E}.Release|x64.Build.0 = Release|Any CPU
 		{1A18270D-2445-476A-A491-D9EDD2D2886E}.Release|x86.ActiveCfg = Release|Any CPU
 		{1A18270D-2445-476A-A491-D9EDD2D2886E}.Release|x86.Build.0 = Release|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Debug|x64.Build.0 = Debug|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Debug|x86.Build.0 = Debug|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Release|x64.ActiveCfg = Release|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Release|x64.Build.0 = Release|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Release|x86.ActiveCfg = Release|Any CPU
+		{9422DE4D-84B4-41FC-8884-1B91744469D3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,5 +128,6 @@ Global
 		{C6B6D6CC-6354-478C-B3B5-8E21A2B2AFFA} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
 		{83B70CA1-B2A7-4CD9-8BD0-FCC7D1D54E25} = {B823569F-1A84-4195-A7E3-395A74E43E89}
 		{1A18270D-2445-476A-A491-D9EDD2D2886E} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
+		{9422DE4D-84B4-41FC-8884-1B91744469D3} = {B823569F-1A84-4195-A7E3-395A74E43E89}
 	EndGlobalSection
 EndGlobal

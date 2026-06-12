@@ -66,6 +66,7 @@ internal static class DashboardEndpoints
         if (method == "GET" && path == "/api/alerts") { await WriteJson(ctx, DashboardApi.Alerts(QueryInt(ctx, "take", 100))); return; }
         if (method == "GET" && path == "/api/stream") { await StreamAsync(ctx); return; }
         if (method == "DELETE" && path == "/api/sessions") { DashboardApi.Clear(); ctx.Response.StatusCode = 204; return; }
+        if (method == "POST" && path == "/api/ingest") { await IngestAsync(ctx); return; }
         if (method == "GET") { await ServeAssetAsync(ctx, path); return; }
 
         ctx.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
@@ -82,6 +83,36 @@ internal static class DashboardEndpoints
 
     private static async Task WriteJson(HttpContext ctx, object payload)
         => await ctx.Response.WriteAsJsonAsync(payload, NHibernautServer.JsonOptions);
+
+    private static async Task IngestAsync(HttpContext ctx)
+    {
+        SessionDetailDto? dto;
+        try
+        {
+            dto = await ctx.Request.ReadFromJsonAsync<SessionDetailDto>(NHibernautServer.JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            NHibernautRuntime.ReportInternalError(ex);
+            ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+
+        if (dto is null) { ctx.Response.StatusCode = StatusCodes.Status400BadRequest; return; }
+
+        try
+        {
+            DashboardApi.Ingest(dto);
+        }
+        catch (Exception ex)
+        {
+            NHibernautRuntime.ReportInternalError(ex);
+            ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+
+        ctx.Response.StatusCode = StatusCodes.Status202Accepted;
+    }
 
     private static async Task ServeAssetAsync(HttpContext ctx, string path)
     {

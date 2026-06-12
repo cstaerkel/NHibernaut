@@ -290,7 +290,66 @@ DTOs decouple the JSON from the model (no locks on the wire) and render values a
 
 ---
 
-## 7. Tier B — zero-touch logging baseline
+## 7. Remote ingestion (centralized dashboard)
+
+The dashboard server can also run **out-of-process**: deploy one instance and have many profiled apps
+**forward** their sealed sessions to it over HTTP. This turns NHibernaut into a centralized profiler —
+one dashboard, many reporting apps, closer to the commercial NHibernate Profiler's collector model —
+while reusing the same store, query API, aggregate, and SSE feed unchanged.
+
+Two pieces, both fail-safe:
+
+- **Sender — `RemoteForwarder`** (in NHibernaut.Server; `RemoteForwarder.Enable(url, token)`): subscribes
+  to `IProfilerStore.SessionSealed`, snapshots each sealed session to the wire DTO under its `SyncRoot`
+  (`DtoMapper.ToDetail`), and POSTs it to the remote `POST /api/ingest` on a **bounded background
+  channel**. If the dashboard is unreachable the queue drops oldest-first — it never blocks or throws
+  into capture. Enable it *after* `EnableNHibernaut`, so the analysis pass has already attached the
+  session's alerts: they ride the wire and are **not** recomputed remotely.
+- **Receiver — `POST /api/ingest`**: served by **both** transports (the HttpListener `NHibernautServer`
+  and the Tier C `MapNHibernaut` mount) through the shared, transport-agnostic `DashboardApi.Ingest`,
+  so the two stay identical. It runs the same `Authorized` check as every route (the forwarder sends
+  `X-NHibernaut-Token`), then `SessionReconstructor.FromDetail` rebuilds a `ProfiledSession` from the
+  DTO — the inverse of `DtoMapper.ToDetail`, re-parsing Guids/enums and carrying parameter values as
+  display strings — and `IProfilerStore.InsertSession` upserts it and raises `SessionSealed`. From
+  there the ingested session flows through the unchanged query / aggregate / SSE path, so it appears in
+  the list and the live feed exactly like a locally-captured one.
+
+`IProfilerStore.InsertSession` is a **default interface method** (it throws by default), so a custom
+store implemented before remote ingestion existed stays source-compatible — only stores that host a
+central dashboard need override it.
+
+```mermaid
+flowchart LR
+  subgraph Apps["Profiled apps (EnableNHibernaut + RemoteForwarder.Enable)"]
+    A1["App #1"]
+    A2["App #2"]
+    A3["App #3"]
+  end
+  subgraph Central["Deployed dashboard — NHibernaut.Server.Host service"]
+    Ing["POST /api/ingest (auth)"]
+    Rec["SessionReconstructor"]
+    Store[("IProfilerStore.InsertSession")]
+    Api["DashboardApi + SSE"]
+  end
+  A1 -->|"POST sealed session"| Ing
+  A2 -->|POST| Ing
+  A3 -->|POST| Ing
+  Ing --> Rec --> Store --> Api
+  Browser["Browser"] --> Api
+```
+
+The deployable instance is **`NHibernaut.Server.Host`**, a thin executable that wraps
+`NHibernautServer.Start()` in a .NET Generic Host `BackgroundService` (integrating with the Windows
+SCM, systemd, and launchd) and reads `NHIBERNAUT_BIND` / `NHIBERNAUT_PORT` / `NHIBERNAUT_AUTH_TOKEN`.
+It ships as native installers (`.msi` / `.deb` / `.rpm` / `.pkg`) — see the [Install guide](INSTALL.md).
+
+> Enable forwarding in the apps you profile, **not** on the central host itself: its `InsertSession`
+> raises `SessionSealed`, so a forwarder there would re-forward everything it ingests. Forwarding needs
+> a reference to NHibernaut.Server, but the app does not host its own dashboard.
+
+---
+
+## 8. Tier B — zero-touch logging baseline
 
 A `[ModuleInitializer]` in Core installs a custom NHibernate logger factory on assembly load. Its
 `NHibernate.SQL` logger captures SQL text + session id (no timing/params/objects). It **stands down**
@@ -302,7 +361,7 @@ B never double-capture. The install is fail-safe and idempotent.
 
 ---
 
-## 8. Tier C — ASP.NET Core request correlation
+## 9. Tier C — ASP.NET Core request correlation
 
 The middleware tags each request with an id (`NHibernautRequestContext.CurrentRequestId`, an
 `AsyncLocal`), so sessions created during that request get a `RequestId`. On response start it sums the
@@ -329,7 +388,7 @@ sequenceDiagram
 
 ---
 
-## 9. Threading & fail-safety
+## 10. Threading & fail-safety
 
 - **Fail-safe is non-negotiable.** Every capture entry point is wrapped (`NHibernautRuntime.SafeExecute`)
   so an internal error is swallowed and routed to `InternalError` — it never throws into, materially
@@ -343,7 +402,7 @@ sequenceDiagram
 
 ---
 
-## 10. Extension points
+## 11. Extension points
 
 - **`IProfilerStore`** — provide a custom sink (file, OTLP, …): `NHibernautRuntime.Store = new MyStore();`.
 - **`IAlertDetector`** — add a detector and run a pipeline that includes it:

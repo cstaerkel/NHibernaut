@@ -18,8 +18,14 @@
     <Product>NHibernaut</Product>
     <Copyright>Copyright (c) NHibernaut contributors</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/nhibernaut/nhibernaut</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/cstaerkel/NHibernaut</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cstaerkel/NHibernaut</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageTags>nhibernate;profiler;orm;sql;diagnostics;performance</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
 </Project>

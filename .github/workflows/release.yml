@@ -1,0 +1,154 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { global-json-file: global.json }
+      - name: Derive version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Install fpm
+        run: sudo gem install --no-document fpm
+      - name: Publish (linux-x64)
+        run: dotnet publish src/NHibernaut.Server.Host -c Release -r linux-x64 --self-contained true -p:Version=$VERSION -o publish/linux-x64
+      - name: Lay out package root
+        run: |
+          mkdir -p pkgroot/usr/lib/nhibernaut-dashboard pkgroot/lib/systemd/system pkgroot/etc/nhibernaut-dashboard
+          cp -r publish/linux-x64/* pkgroot/usr/lib/nhibernaut-dashboard/
+          install -m644 installers/linux/nhibernaut-dashboard.service pkgroot/lib/systemd/system/nhibernaut-dashboard.service
+          install -m640 installers/linux/dashboard.env pkgroot/etc/nhibernaut-dashboard/dashboard.env
+      - name: Build .deb and .rpm
+        run: |
+          for t in deb rpm; do
+            fpm -s dir -t $t -n nhibernaut-dashboard -v "$VERSION" --iteration 1 \
+              --description "NHibernaut profiler dashboard server" \
+              --url "https://github.com/cstaerkel/NHibernaut" --license MIT \
+              --after-install installers/linux/after-install.sh \
+              --before-remove installers/linux/before-remove.sh \
+              --config-files /etc/nhibernaut-dashboard/dashboard.env \
+              -C pkgroot .
+          done
+      - name: Smoke test (.deb install → start → curl)
+        run: |
+          sudo dpkg -i nhibernaut-dashboard_${VERSION}-1_amd64.deb
+          printf 'NHIBERNAUT_BIND=127.0.0.1\nNHIBERNAUT_PORT=5005\n' | sudo tee /etc/nhibernaut-dashboard/dashboard.env
+          sudo systemctl enable --now nhibernaut-dashboard
+          curl -fs --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:5005/api/sessions
+          test "$(curl -fs http://127.0.0.1:5005/api/sessions)" = "[]"
+          curl -fs -o /dev/null -w "%{http_code}" http://127.0.0.1:5005/ | grep -q 200
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-installers
+          path: |
+            nhibernaut-dashboard_*.deb
+            nhibernaut-dashboard-*.rpm
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { global-json-file: global.json }
+      - name: Derive version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Install WiX v5
+        run: dotnet tool install --global wix --version 5.*
+      - name: Publish (win-x64)
+        run: dotnet publish src/NHibernaut.Server.Host -c Release -r win-x64 --self-contained true -p:Version=$env:VERSION -o publish/win-x64
+      - name: Build MSI
+        run: wix build installers/windows/Package.wxs -arch x64 -d Version=$env:VERSION -d "PublishDir=publish/win-x64" -o "nhibernaut-dashboard-$env:VERSION-win-x64.msi"
+      - name: Smoke test (MSI install → start → curl)
+        shell: pwsh
+        run: |
+          Start-Process msiexec.exe -ArgumentList "/i nhibernaut-dashboard-$env:VERSION-win-x64.msi /quiet /norestart" -Wait
+          # The SCM reads a service's per-service Environment (REG_MULTI_SZ) at start,
+          # so override the bind to loopback here (machine env vars are not re-read on restart).
+          $svc = "HKLM:\SYSTEM\CurrentControlSet\Services\NHibernautDashboard"
+          New-ItemProperty -Path $svc -Name Environment -PropertyType MultiString -Value @("NHIBERNAUT_BIND=127.0.0.1") -Force | Out-Null
+          Restart-Service NHibernautDashboard
+          $ok = $false
+          for ($i=0; $i -lt 30; $i++) {
+            try { if ((Invoke-WebRequest http://127.0.0.1:5005/api/sessions -UseBasicParsing).Content -eq "[]") { $ok=$true; break } } catch {}
+            Start-Sleep 1
+          }
+          if (-not $ok) { throw "dashboard did not come up" }
+      - uses: actions/upload-artifact@v4
+        with: { name: windows-installer, path: "*.msi" }
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { global-json-file: global.json }
+      - name: Derive version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Publish (osx-arm64)
+        run: dotnet publish src/NHibernaut.Server.Host -c Release -r osx-arm64 --self-contained true -p:Version=$VERSION -o publish/osx-arm64
+      - name: Build .pkg
+        run: |
+          mkdir -p payload/usr/local/nhibernaut-dashboard payload/Library/LaunchDaemons
+          cp -r publish/osx-arm64/* payload/usr/local/nhibernaut-dashboard/
+          cp installers/macos/com.nhibernaut.dashboard.plist payload/Library/LaunchDaemons/
+          chmod 644 payload/Library/LaunchDaemons/com.nhibernaut.dashboard.plist
+          chmod +x installers/macos/scripts/postinstall
+          pkgbuild --root payload --scripts installers/macos/scripts \
+            --identifier com.nhibernaut.dashboard --version "$VERSION" \
+            --install-location / "nhibernaut-dashboard-${VERSION}-osx-arm64.pkg"
+      - name: Smoke test (.pkg install → start → curl)
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :EnvironmentVariables:NHIBERNAUT_BIND 127.0.0.1" payload/Library/LaunchDaemons/com.nhibernaut.dashboard.plist
+          pkgbuild --root payload --scripts installers/macos/scripts --identifier com.nhibernaut.dashboard --version "$VERSION" --install-location / smoke.pkg
+          sudo installer -pkg smoke.pkg -target /
+          curl -fs --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:5005/api/sessions
+          test "$(curl -fs http://127.0.0.1:5005/api/sessions)" = "[]"
+      - uses: actions/upload-artifact@v4
+        with: { name: macos-installer, path: "nhibernaut-dashboard-*-osx-arm64.pkg" }
+
+  nuget:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC token for NuGet Trusted Publishing
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { global-json-file: global.json }
+      - name: Derive version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Pack the three libraries
+        run: dotnet pack NHibernaut.sln -c Release -p:Version=$VERSION -p:ContinuousIntegrationBuild=true -o nupkgs
+      # Trusted Publishing (OIDC) — no long-lived API key. One-time setup:
+      #   1. nuget.org -> Trusted Publishing -> add a policy for this owner/repo
+      #      with workflow file "release.yml" (reserve the NHibernaut.* names first).
+      #   2. Add a repository variable NUGET_USER = your nuget.org username (profile name).
+      # If NUGET_USER is unset the push is skipped so the pipeline still runs
+      # end-to-end (packages are attached to the release either way).
+      - name: NuGet login (Trusted Publishing / OIDC -> short-lived key)
+        id: login
+        if: ${{ vars.NUGET_USER != '' }}
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Push to NuGet.org
+        if: ${{ vars.NUGET_USER != '' }}
+        run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - uses: actions/upload-artifact@v4
+        with: { name: nuget-packages, path: "nupkgs/*.*nupkg" }
+
+  release:
+    needs: [linux, windows, macos, nuget]
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: dist, merge-multiple: true }
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          files: dist/**
