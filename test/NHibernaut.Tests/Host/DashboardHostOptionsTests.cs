@@ -48,4 +48,16 @@ public class DashboardHostOptionsTests
     public void Invalid_port_throws()
         => Assert.Throws<FormatException>(
             () => DashboardHostOptions.Resolve(Env(("NHIBERNAUT_PORT", "abc")), () => "GEN"));
+
+    [Fact]
+    public void Generated_token_is_url_safe()
+    {
+        var token = DashboardHostOptions.GenerateToken();
+        Assert.False(string.IsNullOrEmpty(token));
+        // Must survive ?token= unchanged: no Base64 '+', '/', '=' that query parsing would mangle.
+        Assert.Equal(token, Uri.EscapeDataString(token));
+        Assert.DoesNotContain('+', token);
+        Assert.DoesNotContain('/', token);
+        Assert.DoesNotContain('=', token);
+    }
 }

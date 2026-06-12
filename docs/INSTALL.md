@@ -65,10 +65,20 @@ Where to set the variables and read the log, per platform:
 
 - **Linux:** edit `/etc/nhibernaut-dashboard/dashboard.env`, then
   `sudo systemctl restart nhibernaut-dashboard`. Logs: `journalctl -u nhibernaut-dashboard`.
-- **Windows:** set machine environment variables (e.g. `NHIBERNAUT_AUTH_TOKEN`) **or** the
-  per-service block at
-  `HKLM\SYSTEM\CurrentControlSet\Services\NHibernautDashboard\Environment`, then
-  `Restart-Service NHibernautDashboard`. Logs: Windows **Event Viewer → Application**.
+- **Windows:** set the service's **per-service** environment block (a `REG_MULTI_SZ` named
+  `Environment`, one `NAME=value` per line) — the Service Control Manager applies it on the next
+  service start. In an elevated PowerShell:
+
+  ```powershell
+  $svc = "HKLM:\SYSTEM\CurrentControlSet\Services\NHibernautDashboard"
+  New-ItemProperty -Path $svc -Name Environment -PropertyType MultiString `
+    -Value @("NHIBERNAUT_AUTH_TOKEN=<your-token>", "NHIBERNAUT_BIND=0.0.0.0") -Force
+  Restart-Service NHibernautDashboard
+  ```
+
+  Machine-level environment variables (set by the MSI or System Properties) are **not** re-read by
+  an already-installed service on `Restart-Service` — they take effect only after a **reboot**, so
+  prefer the per-service block above. Logs: Windows **Event Viewer → Application**.
 - **macOS:** edit `EnvironmentVariables` in
   `/Library/LaunchDaemons/com.nhibernaut.dashboard.plist`, then
   `sudo launchctl unload <plist> && sudo launchctl load -w <plist>`. Logs:

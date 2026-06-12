@@ -1,11 +1,18 @@
 using System;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace NHibernaut.Server.Host;
 
 /// <summary>Resolves the deployed dashboard server's bind/port/token from environment variables.</summary>
 public sealed class DashboardHostOptions
 {
+    /// <summary>
+    /// Generates a random auth token. Uses hex (URL-safe) so it survives the documented
+    /// <c>?token=</c> query-string login — Base64's <c>+</c> would be decoded to a space and reject.
+    /// </summary>
+    public static string GenerateToken() => Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+
     public required string BindAddress { get; init; }
     public required int Port { get; init; }
     public string? AuthToken { get; init; }
