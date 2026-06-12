@@ -33,7 +33,10 @@
         <Component Id="EnvVars" Bitness="always64">
           <Environment Id="EnvBind"  Name="NHIBERNAUT_BIND"       Value="0.0.0.0" Action="set" System="yes" Part="all" Permanent="no" />
           <Environment Id="EnvPort"  Name="NHIBERNAUT_PORT"       Value="5005"    Action="set" System="yes" Part="all" Permanent="no" />
-          <Environment Id="EnvToken" Name="NHIBERNAUT_AUTH_TOKEN" Value=""        Action="set" System="yes" Part="all" Permanent="no" />
+          <!-- NHIBERNAUT_AUTH_TOKEN is intentionally not pre-created: WiX rejects an empty
+               Environment/@Value (WIX0006), and an empty token reads the same as "unset" to the
+               host, which then generates one and logs it. The admin sets a stable token post-install
+               (System env var, or the service's per-service Environment registry — see docs/INSTALL.md). -->
           <RegistryValue Root="HKLM" Key="Software\NHibernaut\Dashboard" Name="installed" Type="integer" Value="1" KeyPath="yes" />
         </Component>
 
