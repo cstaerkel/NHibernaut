@@ -265,7 +265,7 @@ public sealed class NHibernautServer : IDisposable
 
         try
         {
-            NHibernautRuntime.Store.InsertSession(SessionReconstructor.FromDetail(dto));
+            DashboardApi.Ingest(dto);
         }
         catch (Exception ex)
         {

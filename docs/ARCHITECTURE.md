@@ -305,12 +305,18 @@ Two pieces, both fail-safe:
   channel**. If the dashboard is unreachable the queue drops oldest-first — it never blocks or throws
   into capture. Enable it *after* `EnableNHibernaut`, so the analysis pass has already attached the
   session's alerts: they ride the wire and are **not** recomputed remotely.
-- **Receiver — `POST /api/ingest`** (on `NHibernautServer`): runs the same `Authorized` check as every
-  route (the forwarder sends `X-NHibernaut-Token`), then `SessionReconstructor.FromDetail` rebuilds a
-  `ProfiledSession` from the DTO — the inverse of `DtoMapper.ToDetail`, re-parsing Guids/enums and
-  carrying parameter values as display strings — and `IProfilerStore.InsertSession` upserts it and
-  raises `SessionSealed`. From there the ingested session flows through the unchanged query / aggregate
-  / SSE path, so it appears in the list and the live feed exactly like a locally-captured one.
+- **Receiver — `POST /api/ingest`**: served by **both** transports (the HttpListener `NHibernautServer`
+  and the Tier C `MapNHibernaut` mount) through the shared, transport-agnostic `DashboardApi.Ingest`,
+  so the two stay identical. It runs the same `Authorized` check as every route (the forwarder sends
+  `X-NHibernaut-Token`), then `SessionReconstructor.FromDetail` rebuilds a `ProfiledSession` from the
+  DTO — the inverse of `DtoMapper.ToDetail`, re-parsing Guids/enums and carrying parameter values as
+  display strings — and `IProfilerStore.InsertSession` upserts it and raises `SessionSealed`. From
+  there the ingested session flows through the unchanged query / aggregate / SSE path, so it appears in
+  the list and the live feed exactly like a locally-captured one.
+
+`IProfilerStore.InsertSession` is a **default interface method** (it throws by default), so a custom
+store implemented before remote ingestion existed stays source-compatible — only stores that host a
+central dashboard need override it.
 
 ```mermaid
 flowchart LR

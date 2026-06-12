@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -42,6 +43,27 @@ public class M11_IngestTests
         store.InsertSession(SampleSession(id));
         store.InsertSession(SampleSession(id));
         Assert.Equal(1, store.Count);
+    }
+
+    // A custom store written before remote ingestion existed still compiles (InsertSession is a default
+    // interface method), and the default throws if ingest is attempted against a store that didn't opt in.
+    [Fact]
+    public void Custom_store_without_InsertSession_uses_the_throwing_default()
+    {
+        IProfilerStore store = new LegacyStore();
+        Assert.Throws<NotSupportedException>(() => store.InsertSession(new ProfiledSession()));
+    }
+
+    private sealed class LegacyStore : IProfilerStore
+    {
+        public ProfiledSession GetOrCreateSession(Guid sessionId) => new() { Id = sessionId };
+        public ProfiledSession? GetSession(Guid sessionId) => null;
+        public IReadOnlyList<ProfiledSession> GetRecentSessions(int take) => Array.Empty<ProfiledSession>();
+        public void SealSession(Guid sessionId) { }
+        public void Clear() { }
+        public int Count => 0;
+        public event Action<ProfiledSession>? SessionSealed { add { } remove { } }
+        // InsertSession intentionally omitted — relies on the default interface implementation.
     }
 
     // ---- Server: wire round-trip + reconstruct ----

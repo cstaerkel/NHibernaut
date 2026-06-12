@@ -12,8 +12,11 @@ using Microsoft.Extensions.Hosting;
 using System.Net.Http;
 using NHibernate;
 using NHibernate.Linq;
+using System.Text;
 using NHibernaut.AspNetCore;
 using NHibernaut.Core;
+using NHibernaut.Core.Model;
+using NHibernaut.Server;
 using NHibernaut.Tests.Domain;
 using NHibernaut.Tests.Infrastructure;
 using Xunit;
@@ -89,6 +92,26 @@ public class M9_AspNetCoreTests
         var html = await client.GetAsync("/nhibernaut/");
         Assert.Equal(HttpStatusCode.OK, html.StatusCode);
         Assert.Contains("NHibernaut", await html.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Mounted_dashboard_accepts_ingest()
+    {
+        using var db = new SqliteTestDatabase();
+        using var sf = db.BuildProfiledSessionFactory();
+        using var host = BuildHost(sf);
+        var client = host.GetTestClient();
+
+        NHibernautRuntime.Store.Clear();
+        var id = Guid.NewGuid();
+        var session = new ProfiledSession { Id = id, StartedAt = DateTimeOffset.UtcNow, EndedAt = DateTimeOffset.UtcNow, IsSealed = true };
+        var json = JsonSerializer.Serialize(DtoMapper.ToDetail(session), NHibernautServer.JsonOptions);
+
+        var resp = await client.PostAsync("/nhibernaut/api/ingest", new StringContent(json, Encoding.UTF8, "application/json"));
+        Assert.Equal(HttpStatusCode.Accepted, resp.StatusCode);
+
+        var detail = await client.GetAsync($"/nhibernaut/api/sessions/{id}");
+        Assert.Equal(HttpStatusCode.OK, detail.StatusCode);
     }
 
     [Fact]

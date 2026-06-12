@@ -48,6 +48,15 @@ public static class DashboardApi
 
     public static void Clear() => NHibernautRuntime.Store.Clear();
 
+    /// <summary>
+    /// Ingests a session received over the wire (remote forwarding): reconstructs the model and inserts
+    /// it into the store, which raises SessionSealed so it appears in the list and the live feed. Called
+    /// by both transports' <c>POST /api/ingest</c> so the HttpListener server and the Tier C mount stay
+    /// identical.
+    /// </summary>
+    public static void Ingest(SessionDetailDto session)
+        => NHibernautRuntime.Store.InsertSession(SessionReconstructor.FromDetail(session));
+
     /// <summary>Maps a session to its summary DTO (used by the SSE live feed).</summary>
     public static SessionSummaryDto Summarize(ProfiledSession session) => DtoMapper.ToSummary(session);
 
