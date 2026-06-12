@@ -142,6 +142,15 @@ full walkthrough.
 `GET /api/sessions`, `GET /api/sessions/{id}`, `GET /api/aggregate`, `GET /api/alerts`,
 `GET /api/stream` (SSE), `DELETE /api/sessions`, `GET /` + assets.
 
+## Deploy the dashboard as a service
+
+Besides hosting the dashboard in-process, you can install it as a standalone background **service**
+from native OS installers (`.msi` / `.deb` / `.rpm` / `.pkg`) attached to each
+[GitHub Release](https://github.com/nhibernaut/nhibernaut/releases). It runs a self-contained build
+of `NHibernaut.Server.Host` (a Windows service / systemd unit / launchd daemon) serving the dashboard
+at `http://<host>:5005`, configured via `NHIBERNAUT_BIND` / `NHIBERNAUT_PORT` / `NHIBERNAUT_AUTH_TOKEN`.
+See the **[Install guide](docs/INSTALL.md)**.
+
 ## Security notes
 
 The dashboard exposes **SQL and parameter values** — treat it as sensitive.
