@@ -113,6 +113,9 @@ jobs:
 
   nuget:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC token for NuGet Trusted Publishing
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -121,16 +124,21 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
       - name: Pack the three libraries
         run: dotnet pack NHibernaut.sln -c Release -p:Version=$VERSION -p:ContinuousIntegrationBuild=true -o nupkgs
-      - name: Push to NuGet.org (skipped if NUGET_API_KEY is unset)
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          if [ -z "$NUGET_API_KEY" ]; then
-            echo "NUGET_API_KEY secret not set — skipping push (packages still attached to the release)."
-            exit 0
-          fi
-          dotnet nuget push "nupkgs/*.nupkg" --api-key "$NUGET_API_KEY" \
-            --source https://api.nuget.org/v3/index.json --skip-duplicate
+      # Trusted Publishing (OIDC) — no long-lived API key. One-time setup:
+      #   1. nuget.org -> Trusted Publishing -> add a policy for this owner/repo
+      #      with workflow file "release.yml" (reserve the NHibernaut.* names first).
+      #   2. Add a repository variable NUGET_USER = your nuget.org username (profile name).
+      # If NUGET_USER is unset the push is skipped so the pipeline still runs
+      # end-to-end (packages are attached to the release either way).
+      - name: NuGet login (Trusted Publishing / OIDC -> short-lived key)
+        id: login
+        if: ${{ vars.NUGET_USER != '' }}
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Push to NuGet.org
+        if: ${{ vars.NUGET_USER != '' }}
+        run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
       - uses: actions/upload-artifact@v4
         with: { name: nuget-packages, path: "nupkgs/*.*nupkg" }
 
