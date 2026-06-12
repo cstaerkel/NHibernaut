@@ -1,7 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="NHibernaut Dashboard"
            Manufacturer="NHibernaut contributors"
-           Version="$(Version)"
+           Version="$(var.Version)"
            UpgradeCode="9F969AE8-73D5-4328-BB6C-3D26DF765114"
            Scope="perMachine">
 
@@ -12,7 +12,7 @@
       <Directory Id="INSTALLFOLDER" Name="NHibernaut Dashboard">
 
         <Component Id="ServiceExe" Bitness="always64">
-          <File Id="HostExe" Source="$(PublishDir)\nhibernaut-dashboard.exe" KeyPath="yes" />
+          <File Id="HostExe" Source="$(var.PublishDir)\nhibernaut-dashboard.exe" KeyPath="yes" />
           <ServiceInstall Id="DashboardSvc"
                           Name="NHibernautDashboard"
                           DisplayName="NHibernaut Dashboard"
