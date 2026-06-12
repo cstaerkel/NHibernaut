@@ -11,7 +11,7 @@ There are two ways to consume NHibernaut:
 > `NHibernaut.Server.Host`). It serves the same dashboard SPA + JSON API + SSE as the in-process
 > server. On its own its data store is **empty** — it only shows sessions that are fed to it (today
 > that means running profiled code in the same process; remote ingestion is planned). Installers are
-> attached to each [GitHub Release](https://github.com/nhibernaut/nhibernaut/releases).
+> attached to each [GitHub Release](https://github.com/cstaerkel/NHibernaut/releases).
 
 ---
 

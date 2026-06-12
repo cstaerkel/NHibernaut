@@ -27,7 +27,7 @@ jobs:
           for t in deb rpm; do
             fpm -s dir -t $t -n nhibernaut-dashboard -v "$VERSION" --iteration 1 \
               --description "NHibernaut profiler dashboard server" \
-              --url "https://github.com/nhibernaut/nhibernaut" --license MIT \
+              --url "https://github.com/cstaerkel/NHibernaut" --license MIT \
               --after-install installers/linux/after-install.sh \
               --before-remove installers/linux/before-remove.sh \
               --config-files /etc/nhibernaut-dashboard/dashboard.env \
