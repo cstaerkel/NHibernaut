@@ -76,11 +76,14 @@ public sealed class NHibernautServer : IDisposable
 
         if (IsLoopback(bind))
         {
-            // Register both loopback hosts so http://localhost:port and http://127.0.0.1:port both work
-            // (HttpListener matches by Host header, not just the resolved IP).
+            // Bind the loopback IPv4 address directly. We deliberately do NOT register a
+            // "localhost" *hostname* prefix: the managed (non-Windows) HttpListener resolves
+            // hostname prefixes via DNS/NSS while Start()ing, which can hang indefinitely under a
+            // sandboxed service manager (observed with systemd DynamicUser — the service never
+            // signalled ready and was killed at the 90s start timeout). 127.0.0.1 needs no
+            // resolution. Reach a loopback-bound dashboard at http://127.0.0.1:port.
             _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
-            _listener.Prefixes.Add($"http://localhost:{port}/");
-            Url = $"http://localhost:{port}/";
+            Url = $"http://127.0.0.1:{port}/";
         }
         else
         {

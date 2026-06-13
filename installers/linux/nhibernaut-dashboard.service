@@ -1,7 +1,11 @@
 [Unit]
 Description=NHibernaut Dashboard
-After=network-online.target
-Wants=network-online.target
+# Order after the network stack is up (enough to bind a listening socket). We do NOT
+# Want/After network-online.target: the dashboard only *listens* on a local port, it
+# makes no outbound connections at startup, and waiting for network-online stalls the
+# start ~90s (often to the wait-online timeout) on minimal/CI systemd, tripping the
+# default 90s start timeout.
+After=network.target
 
 [Service]
 Type=notify

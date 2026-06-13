@@ -37,7 +37,15 @@ jobs:
         run: |
           sudo dpkg -i nhibernaut-dashboard_${VERSION}-1_amd64.deb
           printf 'NHIBERNAUT_BIND=127.0.0.1\nNHIBERNAUT_PORT=5005\n' | sudo tee /etc/nhibernaut-dashboard/dashboard.env
-          sudo systemctl enable --now nhibernaut-dashboard
+          # If the service fails to start, dump status + journal so the failure is self-explaining
+          # instead of a blind systemd timeout.
+          sudo systemctl enable --now nhibernaut-dashboard || {
+            echo "::group::nhibernaut-dashboard failed to start";
+            sudo systemctl status nhibernaut-dashboard -l --no-pager || true;
+            sudo journalctl -xeu nhibernaut-dashboard --no-pager || true;
+            echo "::endgroup::";
+            exit 1;
+          }
           curl -fs --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:5005/api/sessions
           test "$(curl -fs http://127.0.0.1:5005/api/sessions)" = "[]"
           curl -fs -o /dev/null -w "%{http_code}" http://127.0.0.1:5005/ | grep -q 200
