@@ -19,6 +19,7 @@ public class M8_LoggingBaselineTests
     {
         var prevTierA = NHibernautRuntime.TierAActive;
         var prevStore = NHibernautRuntime.Store;
+        var prevOptions = NHibernautRuntime.Options;
         try
         {
             using var db = new SqliteTestDatabase();
@@ -26,7 +27,11 @@ public class M8_LoggingBaselineTests
             db.CreateSchema(cfg);
             using var sf = cfg.BuildSessionFactory(); // NO EnableNHibernaut — pure Tier B
 
-            // Isolate the measured query into a fresh store with the baseline active.
+            // Measure into a fresh store with the Tier B baseline active. Pin a default Options too: the
+            // Tier B logger only records sampled sessions, and a prior test (e.g. M10's SamplingRate=0.0
+            // case) can leave the global rate below 1.0, which would silently drop this session's SQL.
+            // A default NHibernautOptions samples everything (rate 1.0).
+            NHibernautRuntime.Options = new NHibernautOptions();
             NHibernautRuntime.TierAActive = false;
             NHibernautRuntime.Store = new InMemoryProfilerStore();
 
@@ -43,6 +48,7 @@ public class M8_LoggingBaselineTests
         }
         finally
         {
+            NHibernautRuntime.Options = prevOptions;
             NHibernautRuntime.TierAActive = prevTierA;
             NHibernautRuntime.Store = prevStore;
         }
