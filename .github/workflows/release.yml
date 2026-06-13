@@ -7,8 +7,8 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with: { global-json-file: global.json }
       - name: Derive version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
@@ -49,7 +49,7 @@ jobs:
           curl -fs --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:5005/api/sessions
           test "$(curl -fs http://127.0.0.1:5005/api/sessions)" = "[]"
           curl -fs -o /dev/null -w "%{http_code}" http://127.0.0.1:5005/ | grep -q 200
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: linux-installers
           path: |
@@ -59,8 +59,8 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with: { global-json-file: global.json }
       - name: Derive version
         shell: bash
@@ -86,14 +86,14 @@ jobs:
             Start-Sleep 1
           }
           if (-not $ok) { throw "dashboard did not come up" }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with: { name: windows-installer, path: "*.msi" }
 
   macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with: { global-json-file: global.json }
       - name: Derive version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
@@ -116,7 +116,7 @@ jobs:
           sudo installer -pkg smoke.pkg -target /
           curl -fs --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:5005/api/sessions
           test "$(curl -fs http://127.0.0.1:5005/api/sessions)" = "[]"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with: { name: macos-installer, path: "nhibernaut-dashboard-*-osx-arm64.pkg" }
 
   nuget:
@@ -125,8 +125,8 @@ jobs:
       id-token: write   # OIDC token for NuGet Trusted Publishing
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with: { global-json-file: global.json }
       - name: Derive version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
@@ -147,7 +147,7 @@ jobs:
       - name: Push to NuGet.org
         if: ${{ vars.NUGET_USER != '' }}
         run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with: { name: nuget-packages, path: "nupkgs/*.*nupkg" }
 
   release:
@@ -155,8 +155,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: write }
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with: { path: dist, merge-multiple: true }
-      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+      - uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           files: dist/**
