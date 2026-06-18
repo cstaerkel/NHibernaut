@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NHibernaut.App.ViewModels"
+        x:DataType="vm:MainWindowViewModel"
+        x:Class="NHibernaut.App.Views.MainWindow"
+        Width="1100" Height="720" Title="NHibernaut">
+  <DockPanel>
+    <Border x:Name="TopBar" DockPanel.Dock="Top" Padding="8" Background="{DynamicResource TopBarBackground}">
+      <StackPanel Orientation="Horizontal" Spacing="16">
+        <TextBlock Text="NHibernaut" FontWeight="Bold" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding ConnectionLabel}" Opacity="0.7" VerticalAlignment="Center"
+                   MaxWidth="240" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ConnectionLabel}" />
+        <Button Content="Sessions" Command="{Binding ShowSessionsCommand}" />
+        <Button Content="Worst offenders" Command="{Binding ShowAggregateCommand}" />
+        <Button Content="Compare" Command="{Binding ShowCompareCommand}" />
+        <Button Content="Connection" Command="{Binding ShowConnectionCommand}" />
+        <TextBlock Text="{Binding Sessions.TotalQueries, StringFormat='queries: {0}'}" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding Sessions.TotalMs, StringFormat='ms: {0:F0}'}" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding Sessions.AlertedSessions, StringFormat='alerted: {0}'}" VerticalAlignment="Center" />
+        <Button Content="Clear" Command="{Binding ClearCommand}" />
+        <ToggleButton Content="Live" IsChecked="{Binding Sessions.Live, Mode=TwoWay}" />
+        <Button Command="{Binding ToggleThemeCommand}" ToolTip.Tip="{Binding ThemeToggleTip}"
+                AutomationProperties.Name="{Binding ThemeToggleTip}"
+                Padding="6" VerticalAlignment="Center">
+          <PathIcon Data="{Binding ThemeIcon}" Width="16" Height="16" />
+        </Button>
+      </StackPanel>
+    </Border>
+    <ContentControl Content="{Binding CurrentPage}" />
+  </DockPanel>
+</Window>

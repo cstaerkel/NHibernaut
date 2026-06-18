@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:NHibernaut.App.ViewModels"
+             x:DataType="vm:AggregateViewModel"
+             x:Class="NHibernaut.App.Views.AggregateView">
+  <ScrollViewer>
+    <StackPanel>
+      <!-- Header row -->
+      <Grid ColumnDefinitions="*,60,80,80,80,70,60" Margin="4,4,4,2">
+        <TextBlock Grid.Column="0" Text="Query shape" FontSize="11" Opacity="0.7" FontWeight="SemiBold" />
+        <TextBlock Grid.Column="1" Text="Calls" FontSize="11" Opacity="0.7" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="2" Text="Total ms" FontSize="11" Opacity="0.7" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="3" Text="Avg ms" FontSize="11" Opacity="0.7" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="4" Text="Max rows" FontSize="11" Opacity="0.7" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="5" Text="Sessions" FontSize="11" Opacity="0.7" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="6" Text="N+1" FontSize="11" Opacity="0.7" FontWeight="SemiBold" HorizontalAlignment="Right" />
+      </Grid>
+      <!-- Data rows -->
+      <ItemsControl ItemsSource="{Binding Rows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:AggregateRowViewModel">
+            <Grid ColumnDefinitions="*,60,80,80,80,70,60" Margin="4,1">
+              <TextBlock Grid.Column="0"
+                         Text="{Binding Shape}"
+                         FontFamily="Cascadia Code,Consolas,monospace"
+                         FontSize="11"
+                         TextTrimming="CharacterEllipsis"
+                         ToolTip.Tip="{Binding Shape}" />
+              <TextBlock Grid.Column="1"
+                         Text="{Binding Calls}"
+                         FontSize="11"
+                         HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="2"
+                         Text="{Binding TotalMs, StringFormat='{}{0:F0}'}"
+                         FontSize="11"
+                         HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="3"
+                         Text="{Binding AvgMs, StringFormat='{}{0:F1}'}"
+                         FontSize="11"
+                         HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="4"
+                         Text="{Binding MaxRows}"
+                         FontSize="11"
+                         HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="5"
+                         Text="{Binding Sessions}"
+                         FontSize="11"
+                         HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="6"
+                         Text="{Binding NPlusOneDisplay}"
+                         FontSize="11"
+                         HorizontalAlignment="Right" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

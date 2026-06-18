@@ -1,7 +1,9 @@
 # NHibernaut — Architecture
 
 How NHibernaut hooks into NHibernate, captures activity, analyzes it, and serves the dashboard. For
-*using* the dashboard, see the [User Guide](USER_GUIDE.md); for getting started, the
+*using* the dashboard, see the [User Guide](USER_GUIDE.md); for every option and its default, the
+[Configuration reference](CONFIGURATION.md); for the wire contract, the [HTTP API](API.md); for where
+in the source to change a given behavior, the [Code map](CODE_MAP.md); for getting started, the
 [README](../README.md).
 
 All diagrams are [Mermaid](https://mermaid.js.org/) and render natively on GitHub.
@@ -149,7 +151,7 @@ classDiagram
         bool IsSealed
         +StatementCount() int
         +TotalDurationMs() double
-        +MaxSeverity() AlertSeverity
+        +MaxSeverity() AlertSeverity?
     }
     class ProfiledStatement {
         Guid Id
@@ -206,6 +208,12 @@ classDiagram
     ProfiledStatement "1" *-- "*" ParamCapture
 ```
 
+> The diagram is a simplified subset. Several fields are nullable beyond the `MaxSeverity?` shown —
+> `EndedAt`, `RowsRead`/`RowsAffected`, `Exception`, every `StatementId` back-reference, and a
+> connection/transaction's `ClosedAt`/`CompletedAt` — and a few fields are omitted (`ThreadIds`,
+> per-statement `EntityLoadCount`/`CollectionInitCount`). For exact types see the
+> [HTTP API DTO schemas](API.md#dto-schemas).
+
 ### Storage
 
 `IProfilerStore` is the pluggable sink; the default `InMemoryProfilerStore` is a thread-safe,
@@ -244,8 +252,10 @@ upserts by id). NHibernaut never forces a release mode — that would change hos
 On seal, `AnalysisPipeline` runs all detectors and writes their `Alert`s onto the session. Each
 detector implements `IAlertDetector` and is **isolated** in a fail-safe wrapper: one that throws is
 swallowed (reported to `NHibernautRuntime.InternalError`) and never blocks the others — proven by a
-test. `SqlNormalizer` reduces SQL to a canonical shape (literals/params/whitespace) so N+1 and
-duplicate detection can group by shape.
+test. `SqlNormalizer` reduces SQL to a canonical shape (literals/params/whitespace) so `SelectNPlusOne`
+detection and the dashboard's *worst-offenders* aggregation can group by shape. (`DuplicateQuery` is the
+exception — it groups by **raw** SQL **and** parameter values to catch byte-identical re-executions, so
+it deliberately does *not* use the normalizer.)
 
 The 11 detectors: `SelectNPlusOne`, `TooManyQueries`, `UnboundedResultSet`, `TooManyRows`,
 `TooManyJoins`, `SlowQuery`, `DuplicateQuery`, `CrossThreadSession`, `WriteWithoutTransaction`,
@@ -302,9 +312,10 @@ Two pieces, both fail-safe:
 - **Sender — `RemoteForwarder`** (in NHibernaut.Server; `RemoteForwarder.Enable(url, token)`): subscribes
   to `IProfilerStore.SessionSealed`, snapshots each sealed session to the wire DTO under its `SyncRoot`
   (`DtoMapper.ToDetail`), and POSTs it to the remote `POST /api/ingest` on a **bounded background
-  channel**. If the dashboard is unreachable the queue drops oldest-first — it never blocks or throws
-  into capture. Enable it *after* `EnableNHibernaut`, so the analysis pass has already attached the
-  session's alerts: they ride the wire and are **not** recomputed remotely.
+  channel** (capacity 1024, `BoundedChannelFullMode.DropWrite`). If the dashboard is unreachable the
+  channel drops the **newest** sealed sessions once full — it never blocks or throws into capture.
+  Enable it *after* `EnableNHibernaut`, so the analysis pass has already attached the session's alerts:
+  they ride the wire and are **not** recomputed remotely.
 - **Receiver — `POST /api/ingest`**: served by **both** transports (the HttpListener `NHibernautServer`
   and the Tier C `MapNHibernaut` mount) through the shared, transport-agnostic `DashboardApi.Ingest`,
   so the two stay identical. It runs the same `Authorized` check as every route (the forwarder sends
@@ -339,8 +350,10 @@ flowchart LR
 ```
 
 The deployable instance is **`NHibernaut.Server.Host`**, a thin executable that wraps
-`NHibernautServer.Start()` in a .NET Generic Host `BackgroundService` (integrating with the Windows
-SCM, systemd, and launchd) and reads `NHIBERNAUT_BIND` / `NHIBERNAUT_PORT` / `NHIBERNAUT_AUTH_TOKEN`.
+`NHibernautServer.Start()` in a .NET Generic Host `BackgroundService` (integrating with the Windows SCM
+via `AddWindowsService` and systemd via `AddSystemd`; on macOS it runs as a launchd daemon via the
+installed `.plist`, using the host's default SIGTERM handling) and reads
+`NHIBERNAUT_BIND` / `NHIBERNAUT_PORT` / `NHIBERNAUT_AUTH_TOKEN`.
 It ships as native installers (`.msi` / `.deb` / `.rpm` / `.pkg`) — see the [Install guide](INSTALL.md).
 
 > Enable forwarding in the apps you profile, **not** on the central host itself: its `InsertSession`
@@ -404,9 +417,16 @@ sequenceDiagram
 
 ## 11. Extension points
 
-- **`IProfilerStore`** — provide a custom sink (file, OTLP, …): `NHibernautRuntime.Store = new MyStore();`.
+- **`ParameterRedactor` / `CaptureParameterValues`** — mask or drop parameter values for PII. Both are
+  `public` on `NHibernautOptions`, so this is the supported consumer hook — set it inside the
+  `EnableNHibernaut(o => …)` lambda. See [Configuration §3](CONFIGURATION.md#3-runtime-extension-knobs).
+- **`EditorLinkScheme`** — change the click-to-source scheme (default `vscode`).
+- **`IProfilerStore`** — implement a custom sink (file, OTLP, …). **Caveat:** `NHibernautRuntime.Store`
+  has an `internal` setter and `EnableNHibernaut` always installs its own `InMemoryProfilerStore`, so
+  `NHibernautRuntime.Store = new MyStore();` compiles only from inside the solution (`InternalsVisibleTo`
+  = `NHibernaut.Tests` + `NHibernaut.AspNetCore`). There is currently **no public consumer path** to
+  swap the store — exposing one is a known gap.
 - **`IAlertDetector`** — add a detector and run a pipeline that includes it:
   `NHibernautRuntime.Analysis = new AnalysisPipeline(AnalysisPipeline.DefaultDetectors().Append(new MyDetector()));`.
-  See [CONTRIBUTING](../CONTRIBUTING.md#adding-an-alert-detector).
-- **`ParameterRedactor` / `CaptureParameterValues`** — mask or drop parameter values for PII.
-- **`EditorLinkScheme`** — change the click-to-source scheme (default `vscode`).
+  Same caveat as the store: `Analysis` has an `internal` setter, so this composes only from inside the
+  solution today. See [CONTRIBUTING](../CONTRIBUTING.md#adding-an-alert-detector).

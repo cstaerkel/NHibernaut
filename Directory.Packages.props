@@ -20,6 +20,18 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+
+    <!-- Desktop UI (Avalonia 12) -->
+    <PackageVersion Include="Avalonia" Version="12.0.4" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.0.4" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.0.4" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.0.4" />
+    <!-- NOTE: Avalonia.Diagnostics has no 12.x release on NuGet (latest available: 11.3.17); entry omitted. -->
+    <!-- NOTE: Avalonia.Headless.XUnit (v12) is a xunit v3 package; it conflicts with the solution's
+         xunit v2 stack. App.Tests stays on xunit v2 and tests ViewModels/services as POCOs, so the
+         headless harness is intentionally not referenced. -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
   </ItemGroup>
 
 </Project>
