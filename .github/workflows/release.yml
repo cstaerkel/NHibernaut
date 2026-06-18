@@ -150,7 +150,21 @@ jobs:
       - name: Zip .app and build .dmg
         run: |
           ditto -c -k --keepParent "NHibernaut.app" "nhibernaut-app-${VERSION}-osx-arm64.zip"
-          hdiutil create -volname "NHibernaut" -srcfolder "NHibernaut.app" -ov -format UDZO "nhibernaut-app-${VERSION}-osx-arm64.dmg"
+          # hdiutil create intermittently fails with "Resource busy" on GitHub's macOS runners —
+          # a transient race as the freshly-written .app/volume settles, not a real build error.
+          # Retry a few times so a flake doesn't sink the whole release (it did on v0.2.0).
+          dmg="nhibernaut-app-${VERSION}-osx-arm64.dmg"
+          for attempt in 1 2 3 4 5; do
+            if hdiutil create -volname "NHibernaut" -srcfolder "NHibernaut.app" -ov -format UDZO "$dmg"; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "::error::hdiutil create failed after 5 attempts"
+              exit 1
+            fi
+            echo "hdiutil create failed (attempt $attempt) — likely transient 'Resource busy'; retrying in 5s…"
+            sleep 5
+          done
       - name: Upload desktop (macos)
         uses: actions/upload-artifact@v6
         with:
