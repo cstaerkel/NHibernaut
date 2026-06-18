@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:NHibernaut.App.ViewModels"
+             xmlns:conv="clr-namespace:NHibernaut.App.Converters"
+             x:DataType="vm:SessionsViewModel"
+             x:Class="NHibernaut.App.Views.SessionsView">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <!-- Resizable session-list column: snug to the data by default, draggable via the splitter. -->
+      <ColumnDefinition Width="280" MinWidth="200" MaxWidth="600" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <ListBox Grid.Column="0" ItemsSource="{Binding Sessions}" SelectedItem="{Binding Selected}">
+      <ListBox.Styles>
+        <!-- Give each row a readable accessibility name instead of the VM type name. -->
+        <Style Selector="ListBoxItem">
+          <Setter Property="(AutomationProperties.Name)" Value="{ReflectionBinding AccessibleLabel}" />
+        </Style>
+      </ListBox.Styles>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:SessionItemViewModel">
+          <Grid ColumnDefinitions="14,*">
+            <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                     Fill="{Binding Severity, Converter={x:Static conv:SeverityToBrushConverter.Instance}}" />
+            <StackPanel Grid.Column="1" Margin="6,2">
+              <TextBlock Text="{Binding Summary}" FontFamily="Cascadia Code,Consolas,monospace" />
+              <TextBlock Text="{Binding Started}" Opacity="0.7" FontSize="11" />
+              <TextBlock Text="{Binding Meta}" Opacity="0.7" FontSize="11" />
+            </StackPanel>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <GridSplitter Grid.Column="1" Width="6" ResizeDirection="Columns"
+                  VerticalAlignment="Stretch"
+                  Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+    <ContentControl Grid.Column="2" Content="{Binding Detail}" Margin="8" />
+  </Grid>
+</UserControl>

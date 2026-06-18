@@ -12,12 +12,18 @@ anti-patterns (Select N+1, unbounded result sets, cross-thread session use, …)
 
 Results are viewable in a self-hosted, live web dashboard that the library stands up **itself** from
 its own in-process `HttpListener` server — independent of the host application's web stack (if it
-even has one).
+even has one). A native cross-platform **desktop app** (Windows / macOS / Linux) is also available;
+see the [Desktop app guide](docs/DESKTOP.md).
 
 > MIT licensed. Not affiliated with the commercial NHibernate Profiler.
 
-📖 **Docs:** [User Guide](docs/USER_GUIDE.md) (dashboard walkthrough with screenshots) ·
+📖 **Docs:** [Overview](docs/OVERVIEW.md) (how the pieces fit together — start here) ·
+[User Guide](docs/USER_GUIDE.md) (dashboard walkthrough with screenshots) ·
 [Architecture](docs/ARCHITECTURE.md) (how it works, with diagrams) ·
+[Configuration](docs/CONFIGURATION.md) (every option + its default) ·
+[HTTP API](docs/API.md) (endpoints + DTO schemas) ·
+[Code map](docs/CODE_MAP.md) (where to change what) ·
+[Desktop app](docs/DESKTOP.md) (install, modes, logs) ·
 [Contributing](CONTRIBUTING.md) (build, test, extend)
 
 ## Why
@@ -96,7 +102,7 @@ startup: `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=NHibernaut.AspNetCore` and `NHIBER
 
 | Type | Severity | Rule (default threshold) |
 |---|---|---|
-| `SelectNPlusOne` | Warning | ≥ N statements sharing a normalized SQL shape, or ≥ N collection inits of one role, in a session (N = 10) |
+| `SelectNPlusOne` | Warning | ≥ N statements sharing a normalized SQL shape — or, only when no shape fires, ≥ N collection inits of one role — in a session (N = 10) |
 | `TooManyQueries` | Warning | session statement count > 50 |
 | `UnboundedResultSet` | Warning | a SELECT with no row-limiting clause returning > 100 rows |
 | `TooManyRows` | Warning | a single statement returning > 1000 rows |
@@ -136,9 +142,10 @@ full walkthrough.
 
 ### JSON API
 
-`GET /api/sessions`, `GET /api/sessions/{id}`, `GET /api/aggregate`, `GET /api/alerts`,
-`GET /api/stream` (SSE), `POST /api/ingest` (remote forwarding), `DELETE /api/sessions`,
-`GET /` + assets.
+`GET /api/config`, `GET /api/sessions`, `GET /api/sessions/{id}`, `GET /api/aggregate`,
+`GET /api/alerts`, `GET /api/stream` (SSE), `POST /api/ingest` (remote forwarding),
+`DELETE /api/sessions`, `GET /` + assets. The full contract — query params, auth, DTO schemas — is
+in the **[HTTP API reference](docs/API.md)**.
 
 ## Deploy the dashboard as a service
 

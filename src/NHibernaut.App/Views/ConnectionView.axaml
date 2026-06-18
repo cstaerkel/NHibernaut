@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:NHibernaut.App.ViewModels"
+             xmlns:conv="clr-namespace:NHibernaut.App.Converters"
+             x:DataType="vm:ConnectionViewModel"
+             x:Class="NHibernaut.App.Views.ConnectionView">
+  <ScrollViewer>
+    <StackPanel Spacing="12" Margin="16" MaxWidth="480" HorizontalAlignment="Left">
+      <TextBlock Text="Connection" FontSize="16" FontWeight="SemiBold" />
+
+      <!-- Mode selector -->
+      <CheckBox IsChecked="{Binding Embedded, Mode=TwoWay}"
+                Content="Embedded collector" />
+
+      <!-- Remote fields (visible when NOT Embedded) -->
+      <StackPanel Spacing="8"
+                  IsVisible="{Binding Embedded, Converter={x:Static conv:BoolInverseConverter.Instance}}">
+        <TextBlock Text="Dashboard URL" Opacity="0.7" FontSize="12" />
+        <TextBox Text="{Binding Url, Mode=TwoWay}"
+                 PlaceholderText="http://127.0.0.1:5005" />
+        <TextBlock Text="Token (optional)" Opacity="0.7" FontSize="12" />
+        <TextBox Text="{Binding Token, Mode=TwoWay}"
+                 PlaceholderText="leave blank if unauthenticated"
+                 PasswordChar="*" />
+      </StackPanel>
+
+      <!-- Embedded fields (visible when Embedded) -->
+      <StackPanel Spacing="8"
+                  IsVisible="{Binding Embedded}">
+        <TextBlock Text="Bind address" Opacity="0.7" FontSize="12" />
+        <TextBox Text="{Binding BindAddress, Mode=TwoWay}"
+                 PlaceholderText="127.0.0.1" />
+        <TextBlock Text="Port" Opacity="0.7" FontSize="12" />
+        <TextBox Text="{Binding Port, Mode=TwoWay}"
+                 PlaceholderText="5005" />
+        <TextBlock Text="Token (optional)" Opacity="0.7" FontSize="12" />
+        <TextBox Text="{Binding Token, Mode=TwoWay}"
+                 PlaceholderText="leave blank if unauthenticated"
+                 PasswordChar="*" />
+        <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.7"
+                   Text="Point your apps' RemoteForwarder.Enable(&quot;http://&lt;this-host&gt;:&lt;port&gt;&quot;) at this address." />
+      </StackPanel>
+
+      <!-- Connect button + status -->
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button Content="Connect" Command="{Binding ConnectCommand}" />
+        <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Opacity="0.8" />
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

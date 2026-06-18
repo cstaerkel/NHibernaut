@@ -55,6 +55,19 @@ jobs:
           path: |
             nhibernaut-dashboard_*.deb
             nhibernaut-dashboard-*.rpm
+      - name: Publish Desktop (linux-x64)
+        run: dotnet publish src/NHibernaut.App -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:InvariantGlobalization=true -p:DebugType=none -p:Version=$VERSION -o publish/desktop-linux-x64
+      - name: Tarball Desktop
+        run: tar -C publish/desktop-linux-x64 -czf "nhibernaut-app-${VERSION}-linux-x64.tar.gz" .
+      - name: AppImage Desktop
+        # appimagetool runs with --appimage-extract-and-run (in build-appimage.sh) so no FUSE/libfuse2
+        # is needed on the runner — ubuntu-24.04 renamed libfuse2 to libfuse2t64, so installing it fails.
+        run: bash installers/desktop/linux/build-appimage.sh publish/desktop-linux-x64 "$VERSION"
+      - name: Upload desktop (linux)
+        uses: actions/upload-artifact@v6
+        with:
+          name: desktop-linux
+          path: "nhibernaut-app-*-linux-x64.*"
 
   windows:
     runs-on: windows-latest
@@ -88,6 +101,18 @@ jobs:
           if (-not $ok) { throw "dashboard did not come up" }
       - uses: actions/upload-artifact@v6
         with: { name: windows-installer, path: "*.msi" }
+      - name: Publish Desktop (win-x64)
+        run: dotnet publish src/NHibernaut.App -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:InvariantGlobalization=true -p:DebugType=none -p:Version=$env:VERSION -o publish/desktop-win-x64
+      - name: Zip portable Desktop
+        shell: pwsh
+        run: Compress-Archive -Path publish/desktop-win-x64/* -DestinationPath "nhibernaut-app-$env:VERSION-win-x64.zip"
+      - name: Build Desktop MSI
+        run: wix build installers/desktop/windows/Package.wxs -arch x64 -d Version=$env:VERSION -d "PublishDir=publish/desktop-win-x64" -o "nhibernaut-app-$env:VERSION-win-x64.msi"
+      - name: Upload desktop (windows)
+        uses: actions/upload-artifact@v6
+        with:
+          name: desktop-windows
+          path: "nhibernaut-app-*-win-x64.*"
 
   macos:
     runs-on: macos-latest
@@ -118,6 +143,19 @@ jobs:
           test "$(curl -fs http://127.0.0.1:5005/api/sessions)" = "[]"
       - uses: actions/upload-artifact@v6
         with: { name: macos-installer, path: "nhibernaut-dashboard-*-osx-arm64.pkg" }
+      - name: Publish Desktop (osx-arm64, folder)
+        run: dotnet publish src/NHibernaut.App -c Release -r osx-arm64 --self-contained true -p:InvariantGlobalization=true -p:DebugType=none -p:Version=$VERSION -o publish/desktop-osx-arm64
+      - name: Build .app bundle
+        run: bash installers/desktop/macos/build-app.sh publish/desktop-osx-arm64 "$VERSION"
+      - name: Zip .app and build .dmg
+        run: |
+          ditto -c -k --keepParent "NHibernaut.app" "nhibernaut-app-${VERSION}-osx-arm64.zip"
+          hdiutil create -volname "NHibernaut" -srcfolder "NHibernaut.app" -ov -format UDZO "nhibernaut-app-${VERSION}-osx-arm64.dmg"
+      - name: Upload desktop (macos)
+        uses: actions/upload-artifact@v6
+        with:
+          name: desktop-macos
+          path: "nhibernaut-app-*-osx-arm64.*"
 
   nuget:
     runs-on: ubuntu-latest

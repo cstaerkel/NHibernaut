@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:NHibernaut.App.ViewModels"
+             xmlns:conv="clr-namespace:NHibernaut.App.Converters"
+             xmlns:sys="using:System"
+             x:DataType="vm:StatementDetailViewModel"
+             x:Class="NHibernaut.App.Views.StatementDetailView">
+  <ScrollViewer>
+    <StackPanel Spacing="8" Margin="4">
+
+      <!-- SQL -->
+      <TextBlock Text="SQL" FontSize="11" Opacity="0.6" />
+      <TextBox Text="{Binding Sql}"
+               IsReadOnly="True"
+               AcceptsReturn="True"
+               TextWrapping="Wrap"
+               FontFamily="Cascadia Code,Consolas,monospace"
+               FontSize="11"
+               MaxHeight="160" />
+
+      <!-- Parameters -->
+      <TextBlock Text="Parameters" FontSize="11" Opacity="0.6"
+                 IsVisible="{Binding Parameters.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}" />
+      <ItemsControl ItemsSource="{Binding Parameters}"
+                    IsVisible="{Binding Parameters.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ParamRow">
+            <Grid ColumnDefinitions="*,*,Auto" Margin="0,1">
+              <TextBlock Grid.Column="0" Text="{Binding Name}"
+                         FontFamily="Cascadia Code,Consolas,monospace" FontSize="11" />
+              <TextBlock Grid.Column="1" Text="{Binding Value}"
+                         FontFamily="Cascadia Code,Consolas,monospace" FontSize="11" Margin="8,0" />
+              <TextBlock Grid.Column="2" Text="{Binding DbType}"
+                         FontSize="11" Opacity="0.6" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Writes -->
+      <TextBlock Text="Writes" FontSize="11" Opacity="0.6"
+                 IsVisible="{Binding Writes.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}" />
+      <ItemsControl ItemsSource="{Binding Writes}"
+                    IsVisible="{Binding Writes.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sys:String">
+            <TextBlock Text="{Binding}" FontSize="11" TextWrapping="Wrap" Margin="0,1" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Hydrated entities -->
+      <TextBlock Text="Hydrated" FontSize="11" Opacity="0.6"
+                 IsVisible="{Binding Hydrated.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}" />
+      <ItemsControl ItemsSource="{Binding Hydrated}"
+                    IsVisible="{Binding Hydrated.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sys:String">
+            <TextBlock Text="{Binding}" FontSize="11" TextWrapping="Wrap" Margin="0,1" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Initialized collections -->
+      <TextBlock Text="Collections initialized" FontSize="11" Opacity="0.6"
+                 IsVisible="{Binding Initialized.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}" />
+      <ItemsControl ItemsSource="{Binding Initialized}"
+                    IsVisible="{Binding Initialized.Count, Converter={x:Static conv:PositiveToVisibleConverter.Instance}}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sys:String">
+            <TextBlock Text="{Binding}" FontSize="11" Margin="0,1" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Source link -->
+      <StackPanel Orientation="Horizontal" Spacing="6"
+                  IsVisible="{Binding HasSource}">
+        <TextBlock Text="source:" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
+        <Button Padding="4,2"
+                FontSize="11"
+                FontFamily="Cascadia Code,Consolas,monospace"
+                Command="{Binding OpenSourceCommand}"
+                Content="{Binding SourceLink}" />
+      </StackPanel>
+
+      <!-- Stack trace expander -->
+      <Expander Header="stack trace"
+                IsVisible="{Binding StackTrace, Converter={x:Static conv:NullToCollapsedConverter.Instance}}">
+        <TextBox Text="{Binding StackTrace}"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 FontFamily="Cascadia Code,Consolas,monospace"
+                 FontSize="10"
+                 MaxHeight="200" />
+      </Expander>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

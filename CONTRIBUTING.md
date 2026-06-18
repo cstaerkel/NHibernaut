@@ -1,7 +1,9 @@
 # Contributing to NHibernaut
 
 Thanks for your interest! NHibernaut is MIT-licensed. This guide covers building, testing, and the
-common extension points. For how the pieces fit together, read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+common extension points. For how the pieces fit together, read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md);
+to find *where* in the source a given behavior lives, the [docs/CODE_MAP.md](docs/CODE_MAP.md); for every
+option and its default, [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ## Prerequisites
 
@@ -83,14 +85,22 @@ samples/                    console (self-hosted dashboard) + web (Tier C)
        AnalysisPipeline.DefaultDetectors().Append(new MyDetector()));
    ```
 
+   > Note: `NHibernautRuntime.Analysis` has an `internal` setter, so this composes only from inside the
+   > solution today — same `InternalsVisibleTo` caveat as the custom store below.
+
 4. If the threshold is configurable, add it to `NHibernautOptions` with a sensible default and assert
    the default in `M1_OptionsTests`.
 
 ## Custom storage sink
 
-Implement `IProfilerStore` (e.g. to forward to a file or OTLP) and set
-`NHibernautRuntime.Store = new MyStore();` after `EnableNHibernaut`. The default
-`InMemoryProfilerStore` shows the expected semantics (bounded retention, `SessionSealed` event).
+Implement `IProfilerStore` (e.g. to forward to a file or OTLP). The default `InMemoryProfilerStore`
+shows the expected semantics (bounded retention, `SessionSealed` event).
+
+> **Caveat (in-solution only).** `NHibernautRuntime.Store` has an `internal` setter and
+> `EnableNHibernaut` always installs its own `InMemoryProfilerStore`, so `NHibernautRuntime.Store = …`
+> compiles only from within the solution (`InternalsVisibleTo` = `NHibernaut.Tests` +
+> `NHibernaut.AspNetCore`). There is no public consumer path to swap the store yet; exposing one (an
+> `EnableNHibernaut(store: …)` overload or a public setter) is a welcome contribution.
 
 ## Submitting changes
 

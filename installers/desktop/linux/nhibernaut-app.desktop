@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=NHibernaut
+Comment=NHibernate profiler dashboard (desktop)
+Exec=nhibernaut-app
+Icon=nhibernaut-app
+Categories=Development;
+Terminal=false
