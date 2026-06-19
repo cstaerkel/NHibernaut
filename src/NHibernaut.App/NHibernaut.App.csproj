@@ -9,6 +9,8 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Embeds the app icon into nhibernaut-app.exe on Windows (PE-only; ignored on linux/osx apphosts). -->
+    <ApplicationIcon>Assets\nhibernaut-app.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
   <ItemGroup>

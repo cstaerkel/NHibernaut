@@ -3,6 +3,7 @@
         xmlns:vm="clr-namespace:NHibernaut.App.ViewModels"
         x:DataType="vm:MainWindowViewModel"
         x:Class="NHibernaut.App.Views.MainWindow"
+        Icon="/Assets/nhibernaut-app.ico"
         Width="1100" Height="720" Title="NHibernaut">
   <DockPanel>
     <Border x:Name="TopBar" DockPanel.Dock="Top" Padding="8" Background="{DynamicResource TopBarBackground}">
