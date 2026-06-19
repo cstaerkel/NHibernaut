@@ -8,6 +8,11 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of NHibernaut is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
+    <!-- SourceFile is resolved relative to the `wix build` working directory (repo root in CI),
+         not to this .wxs file. The icon lives in the App source tree, not the published output. -->
+    <Icon Id="AppIcon.ico" SourceFile="src\NHibernaut.App\Assets\nhibernaut-app.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="NHibernaut" />
     </StandardDirectory>
@@ -24,7 +29,8 @@
       <Shortcut Id="AppStartMenuShortcut"
                 Name="NHibernaut"
                 Target="[INSTALLFOLDER]nhibernaut-app.exe"
-                WorkingDirectory="INSTALLFOLDER" />
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="AppIcon.ico" />
       <RemoveFolder Id="RemoveAppShortcutFolder" On="uninstall" />
       <RegistryValue Root="HKCU" Key="Software\NHibernaut\App" Name="installed" Type="integer" Value="1" KeyPath="yes" />
     </Component>
