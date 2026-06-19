@@ -173,6 +173,9 @@ jobs:
 
   nuget:
     runs-on: ubuntu-latest
+    # The nuget.org Trusted Publishing policy is bound to the "release" environment,
+    # so the OIDC token must carry that environment claim or the token exchange 401s.
+    environment: release
     permissions:
       id-token: write   # OIDC token for NuGet Trusted Publishing
       contents: read
