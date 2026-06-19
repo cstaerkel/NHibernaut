@@ -83,7 +83,7 @@ jobs:
       - name: Publish (win-x64)
         run: dotnet publish src/NHibernaut.Server.Host -c Release -r win-x64 --self-contained true -p:Version=$env:VERSION -o publish/win-x64
       - name: Build MSI
-        run: wix build installers/windows/Package.wxs -arch x64 -d Version=$env:VERSION -d "PublishDir=publish/win-x64" -o "nhibernaut-dashboard-$env:VERSION-win-x64.msi"
+        run: wix build installers/windows/Package.wxs -arch x64 -pdbtype none -d Version=$env:VERSION -d "PublishDir=publish/win-x64" -o "nhibernaut-dashboard-$env:VERSION-win-x64.msi"
       - name: Smoke test (MSI install → start → curl)
         shell: pwsh
         run: |
@@ -107,12 +107,16 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path publish/desktop-win-x64/* -DestinationPath "nhibernaut-app-$env:VERSION-win-x64.zip"
       - name: Build Desktop MSI
-        run: wix build installers/desktop/windows/Package.wxs -arch x64 -d Version=$env:VERSION -d "PublishDir=publish/desktop-win-x64" -o "nhibernaut-app-$env:VERSION-win-x64.msi"
+        # -pdbtype none suppresses the .wixpdb debug-symbol file so it never ships as a release asset.
+        run: wix build installers/desktop/windows/Package.wxs -arch x64 -pdbtype none -d Version=$env:VERSION -d "PublishDir=publish/desktop-win-x64" -o "nhibernaut-app-$env:VERSION-win-x64.msi"
       - name: Upload desktop (windows)
         uses: actions/upload-artifact@v6
         with:
           name: desktop-windows
-          path: "nhibernaut-app-*-win-x64.*"
+          # Only the end-user artifacts — never the .wixpdb (broad *.* would catch it).
+          path: |
+            nhibernaut-app-*-win-x64.msi
+            nhibernaut-app-*-win-x64.zip
 
   macos:
     runs-on: macos-latest
