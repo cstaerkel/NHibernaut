@@ -31,6 +31,28 @@ loopback). Referencing `NHibernaut.Server` is enough; the app does not host its 
 
 ---
 
+## AI profiling through MCP
+
+The standalone service also works as a target for `nhibernaut-mcp`, the NHibernaut MCP server for AI
+clients. Start the service, then point the MCP server at the dashboard URL:
+
+```bash
+nhibernaut-mcp --url http://dashboard-host:5005 --token <dashboard-token>
+```
+
+Or provide the connection through the MCP client environment:
+
+```bash
+NHIBERNAUT_DASHBOARD_URL=http://dashboard-host:5005 \
+NHIBERNAUT_DASHBOARD_TOKEN=<dashboard-token> \
+nhibernaut-mcp
+```
+
+Use the same auth value as `NHIBERNAUT_AUTH_TOKEN` when the service requires auth. See the
+[MCP guide](MCP.md) for tool, resource, prompt, and sensitive-output behavior.
+
+---
+
 ## Install
 
 ### Linux (`.deb` / `.rpm`)

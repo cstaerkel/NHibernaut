@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NHibernaut.Mcp.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NHibernaut.Mcp\NHibernaut.Mcp.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.Client\NHibernaut.Client.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.Server\NHibernaut.Server.csproj" />
+    <ProjectReference Include="..\..\src\NHibernaut.Core\NHibernaut.Core.csproj" />
+  </ItemGroup>
+
+</Project>
