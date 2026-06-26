@@ -189,11 +189,11 @@ jobs:
         with: { global-json-file: global.json }
       - name: Derive version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-      - name: Pack the three libraries
+      - name: Pack libraries and MCP tool
         run: dotnet pack NHibernaut.sln -c Release -p:Version=$VERSION -p:ContinuousIntegrationBuild=true -o nupkgs
       # Trusted Publishing (OIDC) — no long-lived API key. One-time setup:
       #   1. nuget.org -> Trusted Publishing -> add a policy for this owner/repo
-      #      with workflow file "release.yml" (reserve the NHibernaut.* names first).
+      #      with workflow file "release.yml" (reserve the NHibernaut.* names, including NHibernaut.Mcp, first).
       #   2. Add a repository variable NUGET_USER = your nuget.org username (profile name).
       # If NUGET_USER is unset the push is skipped so the pipeline still runs
       # end-to-end (packages are attached to the release either way).

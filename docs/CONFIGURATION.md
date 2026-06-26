@@ -231,6 +231,41 @@ set `NHIBERNAUT_AUTH_TOKEN` yourself. On a loopback bind a missing token is allo
 
 ---
 
+## 5. MCP server configuration
+
+The MCP server (`nhibernaut-mcp`) is a separate .NET tool that connects to an already-running
+dashboard API. It does not read `NHibernautOptions` and it does not configure capture. See the
+[MCP guide](MCP.md) for client setup.
+
+### CLI arguments
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `--url` | `http://127.0.0.1:5005` | Dashboard API URL. |
+| `--token` | *(empty)* | Dashboard auth value sent to the API. |
+| `--timeout-ms` | `10000` | HTTP timeout for dashboard API calls. |
+| `--max-output-chars` | `25000` | Maximum text returned by a tool or resource before truncation. |
+
+### Environment variables
+
+| Variable | Meaning |
+|---|---|
+| `NHIBERNAUT_DASHBOARD_URL` | Dashboard API URL. Used when `--url` is absent. |
+| `NHIBERNAUT_DASHBOARD_TOKEN` | Dashboard auth value. Used when `--token` is absent. |
+| `NHIBERNAUT_AUTH_TOKEN` | Fallback dashboard auth value, useful when matching a standalone service configuration. |
+| `NHIBERNAUT_MCP_TIMEOUT_MS` | HTTP timeout when `--timeout-ms` is absent. |
+| `NHIBERNAUT_MCP_MAX_OUTPUT_CHARS` | Output cap when `--max-output-chars` is absent. |
+| `NHIBERNAUT_MCP_ALLOW_SENSITIVE` | Set to `1` to allow parameter values and stack traces when a tool call also requests them. |
+
+Precedence is CLI first, then MCP-specific environment variables, then defaults. For auth,
+`NHIBERNAUT_AUTH_TOKEN` is only a fallback after `--token` and `NHIBERNAUT_DASHBOARD_TOKEN`.
+
+SQL text is included by default because it is profiling evidence. Parameter values and stack traces
+are hidden unless the tool call explicitly asks for them and `NHIBERNAUT_MCP_ALLOW_SENSITIVE=1` is set
+in the MCP server process.
+
+---
+
 ## Defaults that disagree with the README
 
 **None of the documented default values disagree with the README.** All seven analysis thresholds, the

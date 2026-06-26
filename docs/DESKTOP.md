@@ -53,6 +53,17 @@ fail-safe). Sessions stream into the desktop app in real time.
 
 The web dashboard is also reachable at that bind/port while the embedded collector is running.
 
+The embedded collector can also serve `nhibernaut-mcp` for AI-assisted profiling. Point the MCP server
+at the same bind and port:
+
+```bash
+nhibernaut-mcp --url http://<desktop-host>:<port> --token <dashboard-token>
+```
+
+Loopback embedded collectors normally do not require auth, so the `--token` argument can be omitted.
+For full MCP setup, tools, resources, prompts, and sensitive-output behavior, see the
+[MCP guide](MCP.md).
+
 ---
 
 ## Install

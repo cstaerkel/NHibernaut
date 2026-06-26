@@ -22,6 +22,7 @@ see the [Desktop app guide](docs/DESKTOP.md).
 [Architecture](docs/ARCHITECTURE.md) (how it works, with diagrams) ·
 [Configuration](docs/CONFIGURATION.md) (every option + its default) ·
 [HTTP API](docs/API.md) (endpoints + DTO schemas) ·
+[MCP](docs/MCP.md) (AI-client tools, resources, prompts) ·
 [Code map](docs/CODE_MAP.md) (where to change what) ·
 [Desktop app](docs/DESKTOP.md) (install, modes, logs) ·
 [Contributing](CONTRIBUTING.md) (build, test, extend)
@@ -146,6 +147,14 @@ full walkthrough.
 `GET /api/alerts`, `GET /api/stream` (SSE), `POST /api/ingest` (remote forwarding),
 `DELETE /api/sessions`, `GET /` + assets. The full contract — query params, auth, DTO schemas — is
 in the **[HTTP API reference](docs/API.md)**.
+
+### MCP for AI-assisted profiling
+
+Install `NHibernaut.Mcp` as a .NET tool and point `nhibernaut-mcp` at any running dashboard API, for
+example `nhibernaut-mcp --url http://127.0.0.1:5005`. It exposes read-only MCP tools, resources, and
+prompts so AI clients can triage sessions, explain alerts, rank query shapes, compare before/after
+sessions, and inspect statements. See the **[MCP guide](docs/MCP.md)** for client configuration,
+auth, and sensitive-output rules.
 
 ## Deploy the dashboard as a service
 
